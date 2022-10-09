@@ -9,7 +9,12 @@
 # Brukes for aa finne korteste stier fra en startnode til andre noder
 
 #Topologisk sortering:
+# Ordner nodene i en rettet asyklisk graf (DAG)
+# Gir en mulig «gjennomføringsplan»
+# Dersom det ikke gaar aa topologisk sortere nodene, saa kan vi konkludere med at grafen inneholder en sykel!
 
+from distutils.log import error
+import sys
 
 class Graf:
     def __init__(self):
@@ -74,11 +79,83 @@ class Graf:
                 if kant not in besoekt:
                     besoekt.append(kant)
                     koe.append(kant)
-    
-              
 
-graf = Graf()
-print("DybdeFoerst: ")
-graf.DFSoekHele()
-print("\nBreddeFoerst: ")
-graf.BFSoekHele()
+
+class RettetGraf:  
+    def __init__(self):
+        self.noder = {}
+        self.fil = "inputRettet.txt"
+        self.filen = open(self.fil, "r")
+        
+        for linje in self.filen:
+            self.biter = linje.split(":")
+            kanter = self.biter[1].strip('\n').split(",")
+            
+            if self.biter[0] not in self.noder.keys():
+                node = Node(self.biter[0])
+            else:
+                node = self.noder.get(self.biter[0])
+        
+            #Legger inn som navn:node i ordboken noder
+            self.noder[self.biter[0]] = node
+            
+            if self.biter[1] != '':
+                for kant in kanter:
+                    if kant not in self.noder.keys():
+                        kantnode = Node(kant)
+                        self.noder[kant] = kantnode
+                 
+                    else:
+                        kantnode = self.noder.get(kant)
+               
+                    node.kanter.append(kantnode)
+                    node.utgrad += 1
+                    kantnode.inngrad += 1
+        
+        self.TopSortering()
+        
+        
+    #Topologisk sortering
+    def TopSortering(self):
+        stack = []
+        output = []
+    
+        for node in self.noder:
+            if self.noder[node].inngrad == 0:
+                stack.append(self.noder[node])
+        
+        while len(stack) != 0:
+            curNode = stack.pop()
+            output.append(curNode.navn)
+            
+            for kant in curNode.kanter:
+                curNode.kanter.remove(kant)
+                if kant.inngrad == 0:
+                    stack.append(kant)
+        
+        print(output)
+        
+        if len(output) < len(self.noder):
+            print("ERROR: Graf inneholder en sykel og kan ikke sorteres topologisk")
+
+    
+class Node:
+    def __init__(self, navn):
+        self.navn = navn
+        self.inngrad = 0
+        self.utgrad = 0
+        self.kanter = []
+     
+        
+
+#HOVEDPROGRAM
+if sys.argv[1] == "rettet":
+    graf = RettetGraf()
+    #graf.TopSortering()
+    
+else:
+    graf = Graf()
+    print("DybdeFoerst: ")
+    graf.DFSoekHele()
+    print("\nBreddeFoerst: ")
+    graf.BFSoekHele()
