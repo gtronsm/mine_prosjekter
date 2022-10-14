@@ -15,6 +15,7 @@
 
 from distutils.log import error
 import sys
+from warnings import catch_warnings
 
 class Graf:
     def __init__(self):
@@ -149,13 +150,17 @@ class Node:
         
 
 #HOVEDPROGRAM
-if sys.argv[1] == "rettet":
-    graf = RettetGraf()
-    #graf.TopSortering()
-    
-else:
+
+try:
+    if sys.argv[1] == "rettet":
+        graf = RettetGraf()
+        #graf.TopSortering()
+
+
+except:
     graf = Graf()
     print("DybdeFoerst: ")
     graf.DFSoekHele()
     print("\nBreddeFoerst: ")
     graf.BFSoekHele()
+    
