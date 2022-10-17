@@ -13,9 +13,8 @@
 # Gir en mulig «gjennomføringsplan»
 # Dersom det ikke gaar aa topologisk sortere nodene, saa kan vi konkludere med at grafen inneholder en sykel!
 
-from distutils.log import error
 import sys
-from warnings import catch_warnings
+
 
 class Graf:
     def __init__(self):
@@ -122,21 +121,30 @@ class RettetGraf:
         output = []
     
         for node in self.noder:
+            print(self.noder[node].navn + " inngrad", self.noder[node].inngrad)
+          
+            # Ser etter noder med inngrad 0 - disse kan vi starte med
             if self.noder[node].inngrad == 0:
                 stack.append(self.noder[node])
         
+        # Gaar i lokke over valgene som apner seg
         while len(stack) != 0:
             curNode = stack.pop()
+            print("Cur node", curNode.navn)
             output.append(curNode.navn)
             
-            for kant in curNode.kanter:
-                curNode.kanter.remove(kant)
-                if kant.inngrad == 0:
-                    stack.append(kant)
+            if (curNode.kanter.size() != 0):
+                for kant in curNode.kanter:
+                    print("kant", kant.navn)
+                    curNode.kanter.remove(kant)
+                    kant.inngrad -= 1
+                    curNode.utgrad -= 1
+                    if kant.inngrad == 0:
+                        stack.append(kant)
         
         print(output)
         
-        if len(output) < len(self.noder):
+        if len(output) > len(self.noder):
             print("ERROR: Graf inneholder en sykel og kan ikke sorteres topologisk")
 
     
@@ -147,20 +155,26 @@ class Node:
         self.utgrad = 0
         self.kanter = []
      
-        
+
+
+print("Onsker du en: \n")
+print("(Tast r) Rettet graf")
+print("(Tast u) Urettet graf")
+
+x = input("\nDitt svar: ")
 
 #HOVEDPROGRAM
-
-try:
-    if sys.argv[1] == "rettet":
-        graf = RettetGraf()
-        #graf.TopSortering()
-
-
-except:
+if (x.lower() == "r"):
+    graf = RettetGraf()
+    
+elif (x.lower() == "u"):
     graf = Graf()
     print("DybdeFoerst: ")
     graf.DFSoekHele()
     print("\nBreddeFoerst: ")
     graf.BFSoekHele()
+    
+else:
+    print("\nUgyldig svar. Programmet avsluttes.")
+    exit()
     
