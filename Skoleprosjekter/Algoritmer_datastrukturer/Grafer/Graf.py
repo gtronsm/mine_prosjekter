@@ -183,14 +183,7 @@ class VektetGraf:
                     self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
                     self.noder.get(self.nodene[1]).vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
 
-        # for node in self.noder.keys():
-        #     print(self.noder.get(node).navn , "sine kanter: ")
-        #     for kant in self.noder.get(node).vektKanter:
-        #         print(kant.navn)
-            
-        #     print(self.noder.get(node).vektKanter)
-
-    def dijkstra(self):
+    def djikstra(self):
         key = next(iter(self.noder))
         
         startnode = self.noder[key]
@@ -222,6 +215,47 @@ class VektetGraf:
         for key in dist.keys():
             print(key.navn + " :", dist[key])
 
+class Negativt_vektet_graf:
+    def __init__(self):
+        self.noder = {}
+        self.fil = "inputNegVektet.txt"
+        self.filen = open(self.fil, "r")
+        
+        for linje in self.filen:
+            self.biter = linje.strip('\n').split()
+            self.vekt = self.biter[1]
+            self.nodene = self.biter[0].split("-")
+            
+            if self.nodene[0] not in self.noder.keys():
+                node1 = Node(self.nodene[0])
+                self.noder[self.nodene[0]] = node1
+                
+                if self.nodene[1] not in self.noder.keys():
+                    node2 = Node(self.nodene[1])
+                    self.noder[self.nodene[1]] = node2
+
+                    node1.vektKanter[node2] = float(self.vekt)
+                    node2.vektKanter[node1] = float(self.vekt)
+                
+                else:
+                    self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
+                    self.noder.get(self.nodene[1]).vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
+                    
+            else:
+                if self.nodene[1] not in self.noder.keys():
+                    node2 = Node(self.nodene[1])
+                    self.noder[self.nodene[1]] = node2
+                    
+                    self.noder.get(self.nodene[0]).vektKanter[node2] = float(self.vekt)
+                    node2.vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
+                    
+                else:
+                    self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
+                    self.noder.get(self.nodene[1]).vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
+
+    def bellman_ford(self):
+        pass
+
 
 class Node:
     def __init__(self, navn):
@@ -243,7 +277,9 @@ while x == "true":
     print("(Tast v) Vektet graf")
     print("(Tast n) Negativt vektet graf")
     print("(Tast a) Avslutt")
+    
     x = input("\nDitt svar: ")
+    
     if (x.lower() == "r"):
         graf = Rettet_graf()
         print("\nTopologisk: ")
@@ -258,10 +294,13 @@ while x == "true":
     
     elif (x.lower() == "v"):
         graf = VektetGraf()
-        graf.dijkstra()
+        print("\nDjikstra: ")
+        graf.djikstra()
     
     elif (x.lower() == "n"):
-        pass
+        graf = Negativt_vektet_graf()
+        print("\nBellman Ford: ")
+        graf.bellman_ford()
         
     elif (x.lower() == "a"):
         exit()
