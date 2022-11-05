@@ -16,6 +16,8 @@
 #Dijkstra:
 
 from collections import defaultdict
+from queue import PriorityQueue
+import time
 
 
 class Graf:
@@ -155,12 +157,10 @@ class VektetGraf:
             self.nodene = self.biter[0].split("-")
             
             if self.nodene[0] not in self.noder.keys():
-                print(self.nodene[0], "IKKE FRA FOER")
                 node1 = Node(self.nodene[0])
                 self.noder[self.nodene[0]] = node1
                 
                 if self.nodene[1] not in self.noder.keys():
-                    print(self.nodene[1], "IKKE FRA FOER")
                     node2 = Node(self.nodene[1])
                     self.noder[self.nodene[1]] = node2
 
@@ -173,7 +173,6 @@ class VektetGraf:
                     
             else:
                 if self.nodene[1] not in self.noder.keys():
-                    print(self.nodene[1], "IKKE FRA FOER")
                     node2 = Node(self.nodene[1])
                     self.noder[self.nodene[1]] = node2
                     
@@ -184,24 +183,45 @@ class VektetGraf:
                     self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
                     self.noder.get(self.nodene[1]).vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
 
-        for node in self.noder.keys():
-            print(self.noder.get(node).navn , "sine kanter: ")
-            for kant in self.noder.get(node).vektKanter:
-                print(kant.navn)
+        # for node in self.noder.keys():
+        #     print(self.noder.get(node).navn , "sine kanter: ")
+        #     for kant in self.noder.get(node).vektKanter:
+        #         print(kant.navn)
             
-            print(self.noder.get(node).vektKanter)
+        #     print(self.noder.get(node).vektKanter)
 
-    def Dijkstra(self):
+    def dijkstra(self):
+        key = next(iter(self.noder))
+        
+        startnode = self.noder[key]
         #Tar egentlig inn en startnode, men her setter vi den bare
-        startnode = self.noder.get(0)
         
         visited = set()
         dist = defaultdict(lambda: float('inf'))
+        koe = PriorityQueue()
         
+        koe.put((0,startnode))
+        dist[startnode] = 0
         
-        pass
+        while (koe != 0 and len(visited) < len(self.noder)):
             
-    
+            #Pakker ut tuppel
+            _ , curNode = koe.get()
+            if curNode not in visited:
+                visited.add(curNode)
+                
+                #Her er kant en node
+                for kant in curNode.vektKanter.keys():
+                    vekt = float(dist[curNode]) + curNode.vektKanter.get(kant)
+                    
+                    if vekt < dist[kant]:
+                        dist[kant] = vekt
+                        koe.put((vekt, kant))
+        
+        
+        for key in dist.keys():
+            print(key.navn + " :", dist[key])
+
 
 class Node:
     def __init__(self, navn):
@@ -238,6 +258,7 @@ while x == "true":
     
     elif (x.lower() == "v"):
         graf = VektetGraf()
+        graf.dijkstra()
     
     elif (x.lower() == "n"):
         pass
