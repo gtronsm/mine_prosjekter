@@ -295,9 +295,6 @@ class Negativt_vektet_graf:
                         
         for key in dist.keys():
             print(key.navn + " :", dist[key])
-                
-        
-
 
 class Node:
     def __init__(self, navn):
