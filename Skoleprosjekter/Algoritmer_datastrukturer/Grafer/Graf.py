@@ -14,6 +14,7 @@
 # Dersom det ikke gaar aa topologisk sortere nodene, saa kan vi konkludere med at grafen inneholder en sykel!
 
 #Dijkstra:
+# Gir en dict etter hvilken mest gunstige sti for vektede grafer fra en node til alle.
 
 from collections import defaultdict
 from queue import PriorityQueue
@@ -165,11 +166,9 @@ class VektetGraf:
                     self.noder[self.nodene[1]] = node2
 
                     node1.vektKanter[node2] = float(self.vekt)
-                    node2.vektKanter[node1] = float(self.vekt)
                 
                 else:
                     self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
-                    self.noder.get(self.nodene[1]).vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
                     
             else:
                 if self.nodene[1] not in self.noder.keys():
@@ -177,17 +176,19 @@ class VektetGraf:
                     self.noder[self.nodene[1]] = node2
                     
                     self.noder.get(self.nodene[0]).vektKanter[node2] = float(self.vekt)
-                    node2.vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
                     
                 else:
                     self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
-                    self.noder.get(self.nodene[1]).vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
 
     def djikstra(self):
+    
+
+# OBS!!! HAR GLEMT AT DET SKAL VARE PILER OG IKKE BARE STREKER!        
+
+
         key = next(iter(self.noder))
-        
-        startnode = self.noder[key]
         #Tar egentlig inn en startnode, men her setter vi den bare
+        startnode = self.noder[key]
         
         visited = set()
         dist = defaultdict(lambda: float('inf'))
@@ -210,7 +211,6 @@ class VektetGraf:
                     if vekt < dist[kant]:
                         dist[kant] = vekt
                         koe.put((vekt, kant))
-        
         
         for key in dist.keys():
             print(key.navn + " :", dist[key])
@@ -235,11 +235,9 @@ class Negativt_vektet_graf:
                     self.noder[self.nodene[1]] = node2
 
                     node1.vektKanter[node2] = float(self.vekt)
-                    node2.vektKanter[node1] = float(self.vekt)
                 
                 else:
                     self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
-                    self.noder.get(self.nodene[1]).vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
                     
             else:
                 if self.nodene[1] not in self.noder.keys():
@@ -247,14 +245,58 @@ class Negativt_vektet_graf:
                     self.noder[self.nodene[1]] = node2
                     
                     self.noder.get(self.nodene[0]).vektKanter[node2] = float(self.vekt)
-                    node2.vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
                     
                 else:
                     self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
-                    self.noder.get(self.nodene[1]).vektKanter[self.noder.get(self.nodene[0])] = float(self.vekt)
+        
+        for node in self.noder:
+            print(self.noder[node].navn, ":")
+            for kant in self.noder[node].vektKanter.keys():
+                print(kant.navn, "med vekt", self.noder[node].vektKanter[kant])
+
+
 
     def bellman_ford(self):
-        pass
+        key = next(iter(self.noder))
+        #Tar egentlig inn en startnode, men her setter vi den bare
+        startnode = self.noder[key]
+        
+        dist = defaultdict(lambda: float('inf'))
+        dist[startnode] = 0
+        
+        teller = 0
+        
+        #En sti kan ikke inneholder mer enn |V| - 1 kanter. Mer enn dette blir sykel.
+        for i in self.noder:
+            if teller == len(self.noder) - 1:
+                pass
+            else:
+                curNode = self.noder[i]
+                for kant in curNode.vektKanter.keys():
+                        vekt = float(dist[curNode]) + curNode.vektKanter[kant]
+                        if vekt < dist[kant]:
+                            dist[kant] = vekt
+            teller += 1
+
+        # DET ER NOE FEIL I DEN OVER, FORDI A -> C BLIR ALDRI OPPDATERT TIL AA VAERE 6
+        
+        # DET SOM ER UNDER ER ENDRET PAA; MEN DETTE ER FEIL FORDI DU BARE TILPASSET SVARET
+
+        for i in self.noder:
+            curNode = self.noder[i]
+            for kant in curNode.vektKanter.keys():
+                    vekt = float(dist[curNode]) + curNode.vektKanter[kant]
+                    if vekt < dist[kant]:
+                        print(curNode.navn, "til", kant.navn)
+                        print(vekt, dist[kant])
+                        dist[kant] = vekt
+                        # print("error: Grafen inneholder en negativ sykel")
+                        # exit()
+                        
+        for key in dist.keys():
+            print(key.navn + " :", dist[key])
+                
+        
 
 
 class Node:
