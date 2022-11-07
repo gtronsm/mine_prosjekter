@@ -91,31 +91,47 @@ class Rettet_graf:
         self.noder = {}
         self.fil = "inputRettet.txt"
         self.filen = open(self.fil, "r")
+        self.nodeneKey = set()
         
         for linje in self.filen:
             self.biter = linje.split(":")
-            kanter = self.biter[1].strip('\n').split(",")
+            node = None
             
-            if self.biter[0] not in self.noder.keys() and not self.biter[0] == '':
+            if self.biter[0] not in self.nodeneKey and not self.biter[0] == '':
                 node = Node(self.biter[0])
+                self.nodeneKey.add(node.navn)
+                self.noder[node] = []
             else:
-                node = self.noder.get(self.biter[0])
-        
-            #Legger inn som navn:node i ordboken noder
-            self.noder[self.biter[0]] = node
-            
-            if not kanter[0] == '':
-                for kant in kanter:
-                    if kant not in self.noder.keys():
-                        kantnode = Node(kant)
-                        self.noder[kant] = kantnode
-                 
+                for key in self.noder.keys():
+                    if self.nodene[0] == key.navn:
+                        node = key
                     else:
-                        kantnode = self.noder.get(kant)
-               
-                    node.kanter.append(kantnode)
-                    node.utgrad += 1
-                    kantnode.inngrad += 1
+                        for node in self.noder[key]:
+                            if self.biter[1] == node.navn:
+                                node2 = self.noder[key]
+            
+            if self.biter[1] not in self.nodeneKey and not self.biter[1] == '':
+                node2 = Node(self.biter[1])
+                self.nodeneKey.add(node.navn)
+            else:
+                for key in self.noder.keys():
+                    if self.biter[1] == key.navn:
+                        node2 = key
+                    else:
+                        for node in self.noder[key]:
+                            if self.biter[1] == node.navn:
+                                node2 = self.noder[key]
+            
+            # #Legger inn som navn:node i ordboken noder         
+            self.noder[node].append(node2)
+            node.utgrad += 1
+            node2.inngrad += 1
+        
+        for key in self.noder.keys():
+            print(key.navn, "horer til", self.noder[key])
+        
+        print(self.noder)
+                    
         
     #Topologisk sortering
     def top_sortering(self):
@@ -214,46 +230,6 @@ class VektetGraf:
         for key in dist.keys():
             print(key.navn + " :", dist[key])
 
-class Negativt_vektet_graf:
-    def __init__(self):
-        self.noder = {}
-        self.fil = "inputNegVektet.txt"
-        self.filen = open(self.fil, "r")
-        self.oversiktNoder = set()
-        
-        for linje in self.filen:
-            self.biter = linje.strip('\n').split()
-            self.vekt = self.biter[1]
-            self.nodene = self.biter[0].split("-")
-            
-            if self.nodene[0] not in self.oversiktNoder:
-                node1 = Node(self.nodene[0])
-                self.oversiktNoder.add(node1.navn)
-            
-            else:
-                for key in self.noder:
-                    en , to = key
-                    if self.nodene[0] == en.navn:
-                        node1 = en
-                    elif self.nodene[0] == to.navn:
-                        node1 = to         
-            
-            if self.nodene[1] not in self.oversiktNoder:
-                node2 = Node(self.nodene[1])
-                self.oversiktNoder.add(node2.navn)
-            
-            else:
-                for key in self.noder:
-                    en , to = key
-                    if self.nodene[1] == en.navn:
-                        node2 = en
-                    elif self.nodene[1] == to.navn:
-                        node2 = to
-            
-            tuple = (node1, node2)
-            self.noder[tuple] = float(self.vekt)
-            
-
     def bellman_ford(self):
         key = next(iter(self.noder))
         #Tar egentlig inn en startnode, men her setter vi den bare
@@ -286,6 +262,15 @@ class Negativt_vektet_graf:
         for key in dist.keys():
             print(key.navn, ":", dist[key])
 
+
+    def DAGShortestPath(self):
+        dist = defaultdict(lambda: float('inf'))
+        dist[s] = 0
+        
+        
+        
+        
+        
 class Node:
     def __init__(self, navn):
         self.navn = navn
@@ -311,7 +296,7 @@ while x == "true":
     if (x.lower() == "r"):
         graf = Rettet_graf()
         print("\nTopologisk: ")
-        graf.top_sortering()
+        # graf.top_sortering()
         
     elif (x.lower() == "u"):
         graf = Graf()
@@ -326,9 +311,14 @@ while x == "true":
         graf.djikstra()
     
     elif (x.lower() == "n"):
-        graf = Negativt_vektet_graf()
+        graf = VektetGraf()
         print("\nBellman-Ford: ")
         graf.bellman_ford()
+    
+    elif (x.lower() == "d"):
+        graf = VektetGraf()
+        print("Korteste sti i DAGs: ")
+        graf.DAGShortestPath()
         
     elif (x.lower() == "a"):
         exit()
