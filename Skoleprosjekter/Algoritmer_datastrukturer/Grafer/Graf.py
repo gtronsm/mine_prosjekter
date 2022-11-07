@@ -149,46 +149,46 @@ class Rettet_graf:
 class VektetGraf:
     def __init__(self):
         self.noder = {}
-        self.fil = "inputVektet.txt"
+        self.fil = "inputNegVektet.txt"
         self.filen = open(self.fil, "r")
+        self.oversiktNoder = set()
         
         for linje in self.filen:
             self.biter = linje.strip('\n').split()
             self.vekt = self.biter[1]
             self.nodene = self.biter[0].split("-")
             
-            if self.nodene[0] not in self.noder.keys():
+            if self.nodene[0] not in self.oversiktNoder:
                 node1 = Node(self.nodene[0])
-                self.noder[self.nodene[0]] = node1
-                
-                if self.nodene[1] not in self.noder.keys():
-                    node2 = Node(self.nodene[1])
-                    self.noder[self.nodene[1]] = node2
-
-                    node1.vektKanter[node2] = float(self.vekt)
-                
-                else:
-                    self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
-                    
+                self.oversiktNoder.add(node1.navn)
+            
             else:
-                if self.nodene[1] not in self.noder.keys():
-                    node2 = Node(self.nodene[1])
-                    self.noder[self.nodene[1]] = node2
-                    
-                    self.noder.get(self.nodene[0]).vektKanter[node2] = float(self.vekt)
-                    
-                else:
-                    self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
+                for key in self.noder:
+                    en , to = key
+                    if self.nodene[0] == en.navn:
+                        node1 = en
+                    elif self.nodene[0] == to.navn:
+                        node1 = to         
+            
+            if self.nodene[1] not in self.oversiktNoder:
+                node2 = Node(self.nodene[1])
+                self.oversiktNoder.add(node2.navn)
+            
+            else:
+                for key in self.noder:
+                    en , to = key
+                    if self.nodene[1] == en.navn:
+                        node2 = en
+                    elif self.nodene[1] == to.navn:
+                        node2 = to
+            
+            tuple = (node1, node2)
+            self.noder[tuple] = float(self.vekt)
 
     def djikstra(self):
-    
-
-# OBS!!! HAR GLEMT AT DET SKAL VARE PILER OG IKKE BARE STREKER!        
-
-
         key = next(iter(self.noder))
         #Tar egentlig inn en startnode, men her setter vi den bare
-        startnode = self.noder[key]
+        startnode, _ = key
         
         visited = set()
         dist = defaultdict(lambda: float('inf'))
@@ -197,20 +197,19 @@ class VektetGraf:
         koe.put((0,startnode))
         dist[startnode] = 0
         
-        while (koe != 0 and len(visited) < len(self.noder)):
-            
+        while (koe != 0 and len(visited) < len(self.oversiktNoder)):
             #Pakker ut tuppel
             _ , curNode = koe.get()
             if curNode not in visited:
                 visited.add(curNode)
                 
                 #Her er kant en node
-                for kant in curNode.vektKanter.keys():
-                    vekt = float(dist[curNode]) + curNode.vektKanter.get(kant)
-                    
-                    if vekt < dist[kant]:
-                        dist[kant] = vekt
-                        koe.put((vekt, kant))
+                for tuple in self.noder:
+                    curNode, nextNode = tuple
+                    vekt = float(dist[curNode]) + float(self.noder[tuple])
+                    if vekt < dist[nextNode]:
+                        dist[nextNode] = vekt
+                        koe.put((vekt, nextNode))
         
         for key in dist.keys():
             print(key.navn + " :", dist[key])
@@ -220,46 +219,45 @@ class Negativt_vektet_graf:
         self.noder = {}
         self.fil = "inputNegVektet.txt"
         self.filen = open(self.fil, "r")
+        self.oversiktNoder = set()
         
         for linje in self.filen:
             self.biter = linje.strip('\n').split()
             self.vekt = self.biter[1]
             self.nodene = self.biter[0].split("-")
             
-            if self.nodene[0] not in self.noder.keys():
+            if self.nodene[0] not in self.oversiktNoder:
                 node1 = Node(self.nodene[0])
-                self.noder[self.nodene[0]] = node1
-                
-                if self.nodene[1] not in self.noder.keys():
-                    node2 = Node(self.nodene[1])
-                    self.noder[self.nodene[1]] = node2
-
-                    node1.vektKanter[node2] = float(self.vekt)
-                
-                else:
-                    self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
-                    
+                self.oversiktNoder.add(node1.navn)
+            
             else:
-                if self.nodene[1] not in self.noder.keys():
-                    node2 = Node(self.nodene[1])
-                    self.noder[self.nodene[1]] = node2
-                    
-                    self.noder.get(self.nodene[0]).vektKanter[node2] = float(self.vekt)
-                    
-                else:
-                    self.noder.get(self.nodene[0]).vektKanter[self.noder.get(self.nodene[1])] = float(self.vekt)
-        
-        for node in self.noder:
-            print(self.noder[node].navn, ":")
-            for kant in self.noder[node].vektKanter.keys():
-                print(kant.navn, "med vekt", self.noder[node].vektKanter[kant])
-
-
+                for key in self.noder:
+                    en , to = key
+                    if self.nodene[0] == en.navn:
+                        node1 = en
+                    elif self.nodene[0] == to.navn:
+                        node1 = to         
+            
+            if self.nodene[1] not in self.oversiktNoder:
+                node2 = Node(self.nodene[1])
+                self.oversiktNoder.add(node2.navn)
+            
+            else:
+                for key in self.noder:
+                    en , to = key
+                    if self.nodene[1] == en.navn:
+                        node2 = en
+                    elif self.nodene[1] == to.navn:
+                        node2 = to
+            
+            tuple = (node1, node2)
+            self.noder[tuple] = float(self.vekt)
+            
 
     def bellman_ford(self):
         key = next(iter(self.noder))
         #Tar egentlig inn en startnode, men her setter vi den bare
-        startnode = self.noder[key]
+        startnode, _ = key
         
         dist = defaultdict(lambda: float('inf'))
         dist[startnode] = 0
@@ -267,34 +265,26 @@ class Negativt_vektet_graf:
         teller = 0
         
         #En sti kan ikke inneholder mer enn |V| - 1 kanter. Mer enn dette blir sykel.
-        for i in self.noder:
+        for tuple in self.noder:
             if teller == len(self.noder) - 1:
-                pass
+                break
             else:
-                curNode = self.noder[i]
-                for kant in curNode.vektKanter.keys():
-                        vekt = float(dist[curNode]) + curNode.vektKanter[kant]
-                        if vekt < dist[kant]:
-                            dist[kant] = vekt
-            teller += 1
-
-        # DET ER NOE FEIL I DEN OVER, FORDI A -> C BLIR ALDRI OPPDATERT TIL AA VAERE 6
-        
-        # DET SOM ER UNDER ER ENDRET PAA; MEN DETTE ER FEIL FORDI DU BARE TILPASSET SVARET
-
-        for i in self.noder:
-            curNode = self.noder[i]
-            for kant in curNode.vektKanter.keys():
-                    vekt = float(dist[curNode]) + curNode.vektKanter[kant]
-                    if vekt < dist[kant]:
-                        print(curNode.navn, "til", kant.navn)
-                        print(vekt, dist[kant])
-                        dist[kant] = vekt
-                        # print("error: Grafen inneholder en negativ sykel")
-                        # exit()
+                curNode, nextNode = tuple
+                vekt = float(dist[curNode]) + float(self.noder[tuple])
+                if vekt < dist[nextNode]:
+                    dist[nextNode] = vekt
+                teller += 1
+                
+        #Gar en runde til for aa sjekke at man ikke har en negativ sykel
+        for tuple in self.noder:
+            curNode, nextNode = tuple
+            vekt = float(dist[curNode]) + float(self.noder[tuple])
+            if vekt < dist[nextNode]:
+                print("error: Grafen inneholder en negativ sykel")
+                exit()
                         
         for key in dist.keys():
-            print(key.navn + " :", dist[key])
+            print(key.navn, ":", dist[key])
 
 class Node:
     def __init__(self, navn):
@@ -302,7 +292,6 @@ class Node:
         self.inngrad = 0
         self.utgrad = 0
         self.kanter = []
-        self.vektKanter = {}
      
 #HOVEDPROGRAM
 x = "true"
@@ -338,7 +327,7 @@ while x == "true":
     
     elif (x.lower() == "n"):
         graf = Negativt_vektet_graf()
-        print("\nBellman Ford: ")
+        print("\nBellman-Ford: ")
         graf.bellman_ford()
         
     elif (x.lower() == "a"):
