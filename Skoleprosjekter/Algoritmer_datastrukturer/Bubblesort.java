@@ -24,8 +24,8 @@ public class Bubblesort {
 
     public static ArrayList<Integer> sorterBubble(ArrayList<Integer> liste) {
 
-        for (int i = 0; i < liste.size()-1; i++) {
-            for (int j = 0; j < (liste.size() - i - 1); j++) {
+        for (int i = 0; i <= liste.size()-2; i++) {
+            for (int j = 0; j <= (liste.size() - i - 2); j++) {
                 if (liste.get(j) > liste.get(j + 1)) {
                     int elementVenstre = liste.get(j);
                     int elementHoyre = liste.get(j + 1);

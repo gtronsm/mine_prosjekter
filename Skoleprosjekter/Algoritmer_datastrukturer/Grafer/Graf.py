@@ -22,21 +22,33 @@ import time
 
 
 class Graf:
+    
     def __init__(self):
-        self.ordbok = {}
-        self.kanterListe = []
-        self.fil = "input.txt"
-        self.filen = open(self.fil, "r")
+        self.noder = set()
+        self.kanterListe = {"A":["B"], "B":["A", "C", "D"], "C":["B", "D"], "D":["C", "B"]}
         
-        for linje in self.filen:
-            self.biter = linje.split(":")
-            self.kanter = self.biter[1].strip('\n').split(",")
+        self.noder.add("A")
+        self.noder.add("B")
+        self.noder.add("C")
+        self.noder.add("D")
+        
+        
+    
+    # def __init__(self):
+    #     self.ordbok = {}
+    #     self.kanterListe = []
+    #     self.fil = "input.txt"
+    #     self.filen = open(self.fil, "r")
+        
+    #     for linje in self.filen:
+    #         self.biter = linje.split(":")
+    #         self.kanter = self.biter[1].strip('\n').split(",")
             
-            for kant in self.kanter:
-                self.kanterListe.append(kant)
+    #         for kant in self.kanter:
+    #             self.kanterListe.append(kant)
             
-            self.ordbok[self.biter[0]] = self.kanterListe
-            self.kanterListe = []
+    #         self.ordbok[self.biter[0]] = self.kanterListe
+    #         self.kanterListe = []
             
             
     def DFSoekHele(self):
@@ -84,6 +96,36 @@ class Graf:
                 if kant not in besoekt:
                     besoekt.append(kant)
                     koe.append(kant)
+    
+    def separationnodes_rec(self, noder, kanter, u, d, depth, low, seps):
+        depth[u] = low[u] = d
+        for v in kanter[u]:
+            if v in depth:
+                low[u] = min(low[u], depth[v])
+                continue
+            self.separationnodes_rec(noder, kanter, v, d + 1, depth, low, seps)
+            low[u] = min(low[u], low[v])
+            if d <= low[v]:
+                seps.add(u)
+
+    def separationnodes(self):
+        noder = self.noder
+        kanter = self.kanterListe
+    
+        s = next(iter(noder))
+        depth = {s: 0}
+        low = {s: 0}
+        seps = set()
+
+        for u in kanter[s]:
+            if u not in depth:
+                self.separationnodes_rec(noder, kanter, u, 1, depth, low, seps)
+
+        if len([u for u in E[s] if depth[u] == 1]) > 1:
+            seps.add(s)
+
+        return seps
+
 
 
 class Rettet_graf:  
